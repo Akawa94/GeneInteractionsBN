@@ -1,70 +1,9 @@
-from multiprocessing import Pool, Semaphore
-import time
-
-
-def init(s):
-    global semaphore
-    semaphore = s
-    return
-
 def ExistDseparator(TargetNode,Xi, Z, X, alpha):
     flagExist = False
     dsepSet=[]
     #counter=0
     #print_names(Z)
-    for i in range(1,(2**len(Z))):
-        IDsubsetZ_dec = i
-        IDsubsetZ_bin = bin(IDsubsetZ_dec)
-        subsetZ = getZsubset(IDsubsetZ_bin,Z)
-        # no cache
-        #print("from exist dseparator")
-        dep = Dep(TargetNode,Xi,subsetZ, X, alpha)
-        #print(subsetZ)
-        #print(dep)
-        if (dep==0):
-            flagExist = True
-            dsepSet = subsetZ
-            break
-    #print("Module exist d-separator: ",counter)
-    return [flagExist,dsepSet]
-
-
-# def Dep_batch(params_arr):
-#     returnable = []
-#     for e in params_arr:
-#         if (s.get_value()==1):
-#             result = Dep(*e)
-#             if result == 0:
-#                 l.acquire()
-#                 s.acquire()
-#                 time.sleep(0.5)
-#                 s.release()
-#                 l.release()
-#                 return [True,e[2]]
-#         else:
-#             return [False,[]]
-
-def ExistDseparator_concurrent(TargetNode,Xi, Z, X, alpha):
-    flagExist = False
-    dsepSet=[]
-    #counter=0
-    #print_names(Z)
-    if (len(Z)>10):
-        n_processes = 8
-        s = Semaphore(1)
-        p = Pool(n_processes,initializer=init,initargs=(s))
-        params_arr = [[TargetNode,Xi,getZsubset(bin(index),Z), X, alpha] for x in list(range(1,2**len(Z)))]
-        batch_arr = []
-        step = 2**len(Z)/n_processes
-        for n in range(0,len(n_processes)):
-            batch_arr.append(params_arr[n:n+step])
-        results = p.map(Dep_batch,params_arr)
-        for r in results:
-            if r[0] == True:
-                return r
-        return [False, []]
-        
-    for i in range(1,(2**len(Z))):
+    for i in range(0,(2**len(Z))-1):
         IDsubsetZ_dec = i
         IDsubsetZ_bin = bin(IDsubsetZ_dec)
         subsetZ = getZsubset(IDsubsetZ_bin,Z)
@@ -169,7 +108,7 @@ def MinAssoc(TargetNode, Xi,Z, fixedCondVars, X, alpha):
         subsetZ_min_assoc = fixedCondVars        
     else:
         #print(2**len(Z)-1)
-        for IDsubsetZ_dec in range(1,2**len(Z)):
+        for IDsubsetZ_dec in range(0,2**len(Z)-1):
             IDsubsetZ_bin = bin(IDsubsetZ_dec)
             subsetZ = getZsubset(IDsubsetZ_bin,Z)            
             subsetZ_assoc=Dep(TargetNode, Xi, fixedCondVars+subsetZ,X,alpha)

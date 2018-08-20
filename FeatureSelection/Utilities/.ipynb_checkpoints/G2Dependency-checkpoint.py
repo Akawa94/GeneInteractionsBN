@@ -47,21 +47,6 @@ class G2Dependency():
             return returnable
     
     
-    def put_arr(self,f_params,TargetNode,vvTarget,vvXi,Xi,CondVars):
-        i,j,k = f_params
-        flagData_arr = []
-        condValue = self.__get_cond_values(k,CondVars)
-        flagData_arr.append(np.ones(len(Xi['data'])))
-        for l in range(0,len(CondVars)):
-            X_l = CondVars[l]
-            op_x = self.__dep_dict_retriever(X_l,condValue[l])
-            flagData_arr.append(op_x)
-        
-        flagData_arr.append(self.__dep_dict_retriever(TargetNode,vvTarget[i]))
-        flagData_arr.append(self.__dep_dict_retriever(Xi,vvXi[j]))
-        
-        return flagData_arr
-    
     
     def dependency(self, TargetNode, Xi, CondVars, alpha):
         vvTarget = []
@@ -100,39 +85,30 @@ class G2Dependency():
                         G2 = G2 + S[i][j]*np.log((S[i][j])*N/(Si[i]*Sj[j]))
 
         else: # test conditional dependency
-#             S = np.zeros((len(vvTarget),len(vvXi),szCondVars))
-#             for i in range(0,len(vvTarget)):
-#                 for j in range(0,len(vvXi)):
-#                     for k in range(0,szCondVars):
-#                         condValue = self.__get_cond_values(k,CondVars)
-#                         flagData_arr = []
-#                         flagData_arr.append(np.ones(len(Xi['data'])))
+            S = np.zeros((len(vvTarget),len(vvXi),szCondVars))
+            for i in range(0,len(vvTarget)):
+                for j in range(0,len(vvXi)):
+                    for k in range(0,szCondVars):
+                        condValue = self.__get_cond_values(k,CondVars)
+                        flagData_arr = []
+                        flagData_arr.append(np.ones(len(Xi['data'])))
 
-#                         for l in range(0,len(CondVars)):
-#                             X_l = CondVars[l]
+                        for l in range(0,len(CondVars)):
+                            X_l = CondVars[l]
 
-#                             op_x = self.__dep_dict_retriever(X_l,condValue[l])
+                            op_x = self.__dep_dict_retriever(X_l,condValue[l])
 
-#                             flagData_arr.append(op_x)
-#                             #flagDataCondVars = flagDataCondVars*op_x
+                            flagData_arr.append(op_x)
+                            #flagDataCondVars = flagDataCondVars*op_x
 
-#                         #op1 = dep_dict_retriever(TargetNode,vvTarget[i])
-#                         flagData_arr.append(self.__dep_dict_retriever(TargetNode,vvTarget[i]))
-#                         #op2 = dep_dict_retriever(Xi,vvXi[j])
-#                         flagData_arr.append(self.__dep_dict_retriever(Xi,vvXi[j]))
+                        #op1 = dep_dict_retriever(TargetNode,vvTarget[i])
+                        flagData_arr.append(self.__dep_dict_retriever(TargetNode,vvTarget[i]))
+                        #op2 = dep_dict_retriever(Xi,vvXi[j])
+                        flagData_arr.append(self.__dep_dict_retriever(Xi,vvXi[j]))
 
-#                         flagDataCondVars = reduce(lambda x,y:x*y, flagData_arr)
+                        flagDataCondVars = reduce(lambda x,y:x*y, flagData_arr)
 
-#                         S[i][j][k]=np.sum(flagDataCondVars)
-            i_t = len(vvTarget)
-            j_t = len(vvXi)
-            k_t = szCondVars
-            mul_ijk = list(range(0,i_t*j_t*k_t))
-            flagDataAcum = [self.put_arr([index//(j_t*k_t),index//(k_t)%j_t,index%k_t],TargetNode,vvTarget,vvXi,Xi,CondVars) for index in mul_ijk]
-            flag_calc = *map(lambda x:np.sum(reduce(lambda y,z:y*z, np.array(x)),axis=0),flagDataAcum),
-            S = np.asarray(flag_calc).reshape((i_t,j_t,k_t))
-            
-            
+                        S[i][j][k]=np.sum(flagDataCondVars)
             G2 = 0
             Sjk = np.sum(S,axis=0)
             Sik = np.sum(S,axis=1)
