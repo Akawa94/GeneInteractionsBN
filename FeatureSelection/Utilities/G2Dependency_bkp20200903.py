@@ -75,9 +75,9 @@ class G2Dependency():
         szCondVars = reduce(operator.mul,[int(x['name'].split('@')[1]) for x in CondVars],1)
 
         if self._data_c_size <= (5 * len(vvTarget)*len(vvXi)*(szCondVars)):
-            return [1, False]
+            return 1
 
-        if (len(CondVars)==0): # test marginal dependency
+        if (len(CondVars)==0): # test margianl dependency
             S = np.zeros((len(vvTarget),len(vvXi)))
             for i in range(0,len(vvTarget)):
                 for j in range(0,len(vvXi)):
@@ -159,6 +159,6 @@ class G2Dependency():
         if assoc<0:
             assoc=0
             
-        return [assoc,True]
+        return assoc
         
              
